@@ -34,7 +34,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
         fields = ('id', 'owner', 'owner_name', 'name', 'location', 'cuisine', 'description', 
                   'price_range', 'operating_hours', 'rating', 'cover_image', 'cover_image_url', 
                   'tables', 'menu_items')
-        read_only_fields = ('id', 'rating')
+        read_only_fields = ('id', 'owner', 'rating')
 
     def get_cover_image_url(self, obj):
         if obj.cover_image:
