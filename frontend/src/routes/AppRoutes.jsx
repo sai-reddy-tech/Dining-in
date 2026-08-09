@@ -8,6 +8,7 @@ import RestaurantDetails from '../pages/RestaurantDetails';
 import CustomerDashboard from '../pages/CustomerDashboard';
 import OwnerDashboard from '../pages/OwnerDashboard';
 import AdminDashboard from '../pages/AdminDashboard';
+import BookingConfirmation from '../pages/BookingConfirmation';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -34,6 +35,11 @@ const AppRoutes = () => {
         <Route path="/restaurant/:id" element={
           <PrivateRoute>
             <RestaurantDetails />
+          </PrivateRoute>
+        } />
+        <Route path="/booking-confirmed/:bookingId" element={
+          <PrivateRoute>
+            <BookingConfirmation />
           </PrivateRoute>
         } />
         <Route path="/dashboard" element={

@@ -157,7 +157,7 @@ const RestaurantDetails = () => {
         special_requests: specialRequests + (useAiRecommendation ? " (Booked with AI Table Recommendation)" : ""),
       });
       toast.success("Table reserved successfully!");
-      navigate('/dashboard');
+      navigate(`/booking-confirmed/${res.data.id}`);
     } catch (err) {
       if (err.response?.data?.waitlist_eligible) {
         const join = window.confirm("The selected table/timeslot is occupied. Would you like to join the waitlist queue for this slot?");
