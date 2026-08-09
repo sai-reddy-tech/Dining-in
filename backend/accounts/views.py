@@ -43,3 +43,13 @@ class ProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminUserListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'admin':
+            return Response({"detail": "Only administrators can view the user registry list."}, status=status.HTTP_403_FORBIDDEN)
+        users = User.objects.all().order_by('-id')
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)

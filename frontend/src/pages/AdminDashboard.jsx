@@ -20,16 +20,8 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       if (activeAdminTab === 'users') {
-        const res = await api.get('/accounts/profile/');
-        // The endpoint GET /profile/ returns the current logged-in profile.
-        // For development control, we can fetch all profiles, or mock a list since we are admin!
-        // We'll mock user logs based on user contexts, or try GET /accounts/ if we want.
-        // Let's call /accounts/profile/ to see if we can get user info or mock it to ensure no errors!
-        setUsersList([
-          { id: 1, name: 'Admin User', email: 'admin@test.com', phone: '+91 99999 88888', role: 'admin' },
-          { id: 2, name: 'John Customer', email: 'customer@test.com', phone: '+91 98765 43210', role: 'customer' },
-          { id: 3, name: 'Raj Owner', email: 'owner@test.com', phone: '+91 91234 56789', role: 'owner' }
-        ]);
+        const res = await api.get('/accounts/users/');
+        setUsersList(res.data);
       } else if (activeAdminTab === 'restaurants') {
         const res = await api.get('/restaurants/profiles/');
         setRestaurantsList(res.data);
