@@ -17,6 +17,9 @@ screenshot:
 ![alt text](<Screenshot 2026-08-10 075723.png>)
 
 
+demo video:
+https://drive.google.com/file/d/1DAGGXXRrI2PfXHa7r7ZlwB_345EueL2Z/view?usp=drive_link
+
 
 ## 🛠️ Technology Stack
 
