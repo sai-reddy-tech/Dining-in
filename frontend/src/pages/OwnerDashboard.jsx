@@ -12,6 +12,8 @@ const OwnerDashboard = () => {
   const [tables, setTables] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [restCover, setRestCover] = useState(null);
+  const [menuImage, setMenuImage] = useState(null);
   
   // Forms states
   const [newTableNo, setNewTableNo] = useState('');
@@ -113,23 +115,31 @@ const OwnerDashboard = () => {
     e.preventDefault();
     try {
       setSavingRest(true);
-      const data = {
-        name: restName,
-        cuisine: restCuisine,
-        location: restLoc,
-        description: restDesc,
-        operating_hours: restHours,
-        price_range: restPriceRange
-      };
+      const formData = new FormData();
+      formData.append('name', restName);
+      formData.append('cuisine', restCuisine);
+      formData.append('location', restLoc);
+      formData.append('description', restDesc);
+      formData.append('operating_hours', restHours);
+      formData.append('price_range', restPriceRange);
+      if (restCover) {
+        formData.append('cover_image', restCover);
+      }
       
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+
       if (restaurant) {
         // PUT
-        const res = await api.put(`/restaurants/profiles/${restaurant.id}/`, data);
+        const res = await api.put(`/restaurants/profiles/${restaurant.id}/`, formData, config);
         setRestaurant(res.data);
         toast.success("Restaurant profile updated.");
       } else {
         // POST
-        const res = await api.post('/restaurants/profiles/', data);
+        const res = await api.post('/restaurants/profiles/', formData, config);
         setRestaurant(res.data);
         toast.success("Restaurant registered successfully! Setup your tables and menus next.");
         fetchOwnerData();
@@ -138,6 +148,30 @@ const OwnerDashboard = () => {
       toast.error("Failed to save restaurant profile.");
     } finally {
       setSavingRest(false);
+    }
+  };
+
+  const handleDeleteRestaurant = async () => {
+    if (!restaurant) return;
+    const confirmDelete = window.confirm("Are you sure you want to permanently delete your restaurant profile? This will delete all tables, menu items, and active reservations associated with it.");
+    if (!confirmDelete) return;
+    
+    try {
+      await api.delete(`/restaurants/profiles/${restaurant.id}/`);
+      toast.success("Restaurant profile deleted successfully.");
+      setRestaurant(null);
+      setRestName('');
+      setRestCuisine('');
+      setRestLoc('');
+      setRestDesc('');
+      setRestHours('11:00 AM - 11:00 PM');
+      setRestPriceRange('$$');
+      setTables([]);
+      setMenuItems([]);
+      setBookings([]);
+      setDemandForecast([]);
+    } catch (err) {
+      toast.error("Failed to delete restaurant profile.");
     }
   };
 
@@ -182,17 +216,30 @@ const OwnerDashboard = () => {
       return;
     }
     try {
-      await api.post('/restaurants/menu/', {
-        restaurant: restaurant.id,
-        name: menuName,
-        description: menuDesc,
-        price: parseFloat(menuPrice),
-        category: menuCategory
-      });
+      const formData = new FormData();
+      formData.append('restaurant', restaurant.id);
+      formData.append('name', menuName);
+      formData.append('description', menuDesc);
+      formData.append('price', parseFloat(menuPrice));
+      formData.append('category', menuCategory);
+      if (menuImage) {
+        formData.append('image', menuImage);
+      }
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+
+      await api.post('/restaurants/menu/', formData, config);
       toast.success("Menu item added.");
       setMenuName('');
       setMenuDesc('');
       setMenuPrice('');
+      setMenuImage(null);
+      const fileInput = document.getElementById('menu-image-input');
+      if (fileInput) fileInput.value = '';
       fetchRestaurantMenu(restaurant.id);
     } catch (err) {
       toast.error("Failed to add menu item.");
@@ -400,6 +447,10 @@ const OwnerDashboard = () => {
                       <option value="Drink">Drink</option>
                     </select>
                   </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: '600' }}>Item Image</label>
+                    <input type="file" id="menu-image-input" accept="image/*" onChange={(e) => setMenuImage(e.target.files[0])} style={{ color: 'var(--text-muted)' }} />
+                  </div>
                   <button type="submit" className="btn btn-primary" style={{ width: 'fit-content', padding: '12px 28px' }}>
                     Add Menu Item
                   </button>
@@ -554,10 +605,21 @@ const OwnerDashboard = () => {
                     <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', fontWeight: '600' }}>Restaurant Description</label>
                     <textarea className="input-field" rows="3" style={{ resize: 'none' }} value={restDesc} onChange={(e) => setRestDesc(e.target.value)} />
                   </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.9rem', fontWeight: '600' }}>Cover Image</label>
+                    <input type="file" accept="image/*" onChange={(e) => setRestCover(e.target.files[0])} style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }} />
+                  </div>
                   
-                  <button type="submit" disabled={savingRest} className="btn btn-primary" style={{ width: 'fit-content', padding: '12px 28px', marginTop: '10px' }}>
-                    {savingRest ? "Saving configuration..." : "Save Restaurant Settings"}
-                  </button>
+                  <div style={{ display: 'flex', gap: '16px', marginTop: '18px', flexWrap: 'wrap' }}>
+                    <button type="submit" disabled={savingRest} className="btn btn-primary" style={{ padding: '12px 28px' }}>
+                      {savingRest ? "Saving configuration..." : "Save Restaurant Settings"}
+                    </button>
+                    {restaurant && (
+                      <button type="button" onClick={handleDeleteRestaurant} className="btn btn-danger" style={{ padding: '12px 28px' }}>
+                        Delete Restaurant Profile
+                      </button>
+                    )}
+                  </div>
                 </form>
               </div>
             )}

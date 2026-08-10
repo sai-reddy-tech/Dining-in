@@ -4,7 +4,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import QRCode from 'react-qr-code';
-import { FiHome, FiUser, FiCalendar, FiClock, FiCheckCircle, FiXCircle, FiMessageSquare, FiSend, FiX, FiInfo } from 'react-icons/fi';
+import { FiHome, FiUser, FiCalendar, FiClock, FiCheckCircle, FiXCircle, FiMessageSquare, FiSend, FiX, FiInfo, FiLogOut } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const CustomerDashboard = () => {
